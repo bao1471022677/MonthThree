@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.wangguansheng.dao.SpecDao">
+   
+   <!-- 列表查询 -->
+   <resultMap type="spec" id="specMaper">
+   		<id property="id" column="id"/>
+   		<result property="specName" column="spec_name"/>
+   		<collection property="options" column="id" select="selectOptions"></collection>
+   </resultMap>
+   
+   <select id="selectOptions" resultType="com.wanguansheng.pojo.SpecOption">
+   		SELECT id,option_name as optionName,spec_id as specId ,orders
+   		  FROM hg_spec_option WHERE spec_id=#{id}
+   </select>
+   
+   <select id="list" resultMap="specMaper">
+   	SELECT * FROM hg_spec 
+   	<where>
+   		<if test="name != null and name != ''">
+   			spec_NAME  LIKE '%${name}%'
+   		</if>
+   	</where>
+  		 GROUP BY id
+   </select>
+   
+  	
+  	<!-- 添加 -->
+  	<!-- 主表 -->
+  	<insert id="addSpec" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+  		INSERT INTO hg_spec(spec_name) values(#{specName})
+  	</insert>
+  	<!-- 子表 -->
+  	<insert id="addOption">
+		INSERT INTO hg_spec_option(option_name,spec_id,orders) 
+		   VALUES(#{optionName},#{specId},#{orders})
+	</insert>
+  	
+</mapper>
+
